@@ -23,13 +23,13 @@
     },
     "config": {
         "platform": {
-            "php": "5.4.45"
+            "php": "7"
         }
     },
     "require": {
-        "php": ">=5.4 <8",
+        "php": ">=7.2",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^5.3"
+        "guzzlehttp/guzzle": "^7.5"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9",
