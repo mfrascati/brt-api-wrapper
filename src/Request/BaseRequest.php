@@ -52,15 +52,15 @@ abstract class BaseRequest implements RequestInterface
     public function call()
     {
         $client = new Client([
-            'base_url' => 'https://api.brt.it/rest/v1/',
+            'base_uri' => 'https://api.brt.it/rest/v1/',
             'timeout' => 2.0
         ]);
 
-        $request = $client->createRequest($this->method, $this->endpoint, [
+        $response = $client->request($this->method, $this->endpoint, [
             'json' => $this->createRequestBody()
         ]);
 
-        $response = $client->send($request);
+        // $response = $client->send($request);
 
         $response = json_decode($response->getBody());
 
@@ -73,21 +73,19 @@ abstract class BaseRequest implements RequestInterface
 
     public function toArray()
     {
-        return [$this->dataWrapper => array_filter([
-            'senderCustomerCode' => $this->senderCustomerCode,
-            'numericSenderReference' => $this->numericSenderReference,
-            'alphanumericSenderReference' => $this->alphanumericSenderReference
-        ], function ($v) {
-            return !is_null($v);
-        })];
+        return [
+            $this->dataWrapper => array_filter([
+                'senderCustomerCode' => $this->senderCustomerCode,
+                'numericSenderReference' => $this->numericSenderReference,
+                'alphanumericSenderReference' => $this->alphanumericSenderReference
+            ], function ($v) {
+                return !is_null($v);
+            })
+        ];
     }
 
     public function createRequestBody()
     {
-//        PHP 5.6+ only
-//        $emptyMandatory = array_filter($this->toArray(), function ($v, $k) {
-//            return in_array($k, $this->mandatoryFields) && (is_null($v) || $v === "");
-//        }, 1);
         $arr = $this->toArray();
         $emptyMandatory = [];
         foreach ($arr[$this->dataWrapper] as $k => $v) {
@@ -96,7 +94,7 @@ abstract class BaseRequest implements RequestInterface
             }
         }
         if (count($emptyMandatory) > 0) {
-            throw new RequestException(sprintf('Fields %s are mandatory', implode(', ', array_keys($emptyMandatory))));
+            throw new RequestException(sprintf('Fields %s are mandatory', join(', ', array_keys($emptyMandatory))));
         }
         return array_merge(['account' => $this->account], $arr);
     }
